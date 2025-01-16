@@ -12,6 +12,13 @@ app.use(express.json());
 const users: { name: string }[] = [];
 
 app.post('/user', (req: Request, res: Response) => {
+    const { name } = req.body;
+
+    if (!name) {
+        res.status(400).json({ error: 'Name is required' });
+    }
+    
+    users.push({ name });
     res.status(200).send();
 });
 

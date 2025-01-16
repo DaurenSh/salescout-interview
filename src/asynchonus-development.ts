@@ -14,11 +14,37 @@
 type RequestsResult = {
     data: any,
     status: number
-}
+  }
+  
+  async function fetchAll(urls: string[]): Promise<RequestsResult[]> {
+    const promises = urls.map(async (url) => {
+      const response = await fetch(url);
+      const data = await response.json();
+      return { data, status: response.status };
+    });
 
-async function fetchAll(urls: string[]): Promise<RequestsResult[]> {
-    //Your code goes here
-    return [];
-}
+    const results: RequestsResult[] = [];
+  
+    await new Promise<void>((resolve, reject) => {
+      let completedCount = 0;
+  
+      promises.forEach((p) => {
+        p.then((result) => {
 
-module.exports = { fetchAll };
+          results.push(result);
+          completedCount++;
+  
+          if (completedCount === promises.length) {
+            resolve();
+          }
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    });
+  
+    return results;
+  }
+  
+  module.exports = { fetchAll };
+  
